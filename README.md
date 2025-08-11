@@ -40,13 +40,13 @@ JWT_SECRET=your-very-secure-secret-key
 DB_TYPE=development
 DB_HOST=localhost
 DB_PORT=3306
-DB_NAME=chat_api
+DB_NAME=api
 DB_USER=root
 DB_PASS=
 ```
 
 5. Setup Database (Optional)
-   - Create database `chat_api` in MySQL/PostgreSQL
+   - Create database `api` in MySQL/PostgreSQL
    - Create users table:
    ```sql
    CREATE TABLE users (
