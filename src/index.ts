@@ -4,6 +4,7 @@ import cors from 'cors';
 import helmet from 'helmet';
 import rateLimit from 'express-rate-limit';
 import routes from './routes';
+import { testConnection } from './middleware/database';
 
 dotenv.config();
 const app = express();
@@ -24,10 +25,9 @@ app.use(express.urlencoded({ extended: true }));
 // Routes
 app.use('/', routes);
 
-app.get('/', (req, res) => {
-  res.send('Hello World!');
-});
-
-app.listen(port, () => {
+app.listen(port, async () => {
+  // Test database connection
+  await testConnection();
+  
   return console.log(`Express is listening at http://localhost:${port}`);
 });

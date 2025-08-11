@@ -1,22 +1,24 @@
-# NodeJS API
+# NodeJS Express Starter
 
-A Node.js Express TypeScript API for application with JWT authentication and security middleware.
+A Node.js Express TypeScript API starter with JWT authentication, database integration, and security middleware.
 
 ## Features
 
 - 🚀 Express.js with TypeScript
 - 🔐 JWT Authentication with bcrypt password hashing
-- 🛡️ Security middleware (CORS, Helmet, Rate Limiting)
+- �️ Database integration with Knex.js (MySQL/PostgreSQL)
+- 🏗️ Model-based architecture with BaseModel
+- �🛡️ Security middleware (CORS, Helmet, Rate Limiting)
 - 📝 Environment configuration with dotenv
-- 🏗️ Modular route structure
+- 🧩 Modular route structure
 - ⚡ Hot reload development with tsx/ts-node-dev
 
 ## Installation
 
 1. Clone the repository
 ```bash
-git clone git remote add origin https://github.com/superpck/nodejs-express-starter.git api
-cd api
+git clone https://github.com/superpck/nodejs-express-starter.git
+cd nodejs-express-starter
 ```
 
 2. Install dependencies
@@ -33,7 +35,29 @@ cp .env.example .env
 ```env
 PORT=3000
 JWT_SECRET=your-very-secure-secret-key
+
+# Database Configuration
+DB_TYPE=development
+DB_HOST=localhost
+DB_PORT=3306
+DB_NAME=chat_api
+DB_USER=root
+DB_PASS=
 ```
+
+5. Setup Database (Optional)
+   - Create database `chat_api` in MySQL/PostgreSQL
+   - Create users table:
+   ```sql
+   CREATE TABLE users (
+     id INT AUTO_INCREMENT PRIMARY KEY,
+     username VARCHAR(50) UNIQUE NOT NULL,
+     email VARCHAR(100) UNIQUE NOT NULL,
+     password VARCHAR(255) NOT NULL,
+     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+   );
+   ```
 
 ## Available Scripts
 
@@ -81,6 +105,17 @@ curl -X POST http://localhost:3000/auth/login \
   }'
 ```
 
+### Register Example
+```bash
+curl -X POST http://localhost:3000/auth/register \
+  -H "Content-Type: application/json" \
+  -d '{
+    "username": "newuser",
+    "email": "user@example.com",
+    "password": "password123"
+  }'
+```
+
 ### Using Protected Routes
 Include the JWT token in the Authorization header:
 ```bash
@@ -94,12 +129,26 @@ curl -X GET http://localhost:3000/auth/profile \
 src/
 ├── index.ts              # Main application entry point
 ├── middleware/
-│   └── auth.ts          # JWT authentication middleware
+│   ├── auth.ts          # JWT authentication middleware
+│   └── database.ts      # Database configuration and connection
+├── models/
+│   ├── BaseModel.ts     # Base model class with CRUD operations
+│   └── UserModel.ts     # User model with authentication methods
 └── routes/
     ├── index.ts         # Main routes aggregator
     ├── indexRoute.ts    # Public routes (home, test, health)
     └── loginRoute.ts    # Authentication routes
 ```
+
+## Database Integration
+
+The API uses Knex.js query builder with support for:
+- **MySQL** (default): Set `DB_TYPE=development`
+- **PostgreSQL**: Set `DB_TYPE=postgres`
+
+### Models
+- **BaseModel**: Provides common CRUD operations (`findAll`, `findById`, `create`, `update`, `delete`)
+- **UserModel**: User-specific methods with password hashing and authentication
 
 ## Security Features
 
@@ -123,10 +172,16 @@ npm run dev
 
 ## Environment Variables
 
-| Variable | Description | Default |
-|----------|-------------|---------|
-| `PORT` | Server port | `3000` |
-| `JWT_SECRET` | Secret key for JWT signing | `your-secret-key` |
+| Variable | Description | Default | Example |
+|----------|-------------|---------|---------|
+| `PORT` | Server port | `3000` | `3000` |
+| `JWT_SECRET` | Secret key for JWT signing | `your-secret-key` | `super-secure-jwt-secret-key` |
+| `DB_TYPE` | Database type | `development` | `development` or `postgres` |
+| `DB_HOST` | Database host | `localhost` | `localhost` |
+| `DB_PORT` | Database port | `3306` (MySQL) / `5432` (PostgreSQL) | `3306` |
+| `DB_NAME` | Database name | `chat_api` | `my_app_db` |
+| `DB_USER` | Database user | `root` (MySQL) / `postgres` (PostgreSQL) | `dbuser` |
+| `DB_PASS` | Database password | ` ` | `password123` |
 
 ## Contributing
 
