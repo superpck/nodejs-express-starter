@@ -6,12 +6,13 @@ A Node.js Express TypeScript API starter with JWT authentication, database integ
 
 - 🚀 Express.js with TypeScript
 - 🔐 JWT Authentication with bcrypt password hashing
-- �️ Database integration with Knex.js (MySQL/PostgreSQL)
+- 🗄️ Database integration with Knex.js (MySQL/PostgreSQL)
 - 🏗️ Model-based architecture with BaseModel
-- �🛡️ Security middleware (CORS, Helmet, Rate Limiting)
+- 🛡️ Security middleware (CORS, Helmet, Rate Limiting)
 - 📝 Environment configuration with dotenv
 - 🧩 Modular route structure
 - ⚡ Hot reload development with tsx/ts-node-dev
+- ✨ Built-in TypeScript definitions (no deprecated @types packages)
 
 ## Installation
 

@@ -5,6 +5,17 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [5.1.0] - 2025-09-19-1
+
+### Fixed
+- Removed deprecated `@types/bcryptjs` and `@types/uuid` packages
+- Fixed TypeScript compilation errors related to missing type definitions
+- Modern bcryptjs and uuid packages now provide their own TypeScript types
+
+### Changed
+- Updated dependencies to use built-in TypeScript definitions
+- Cleaned up package.json devDependencies
+
 ## [5.1.0] - 2025-08-11
 
 ### Added
