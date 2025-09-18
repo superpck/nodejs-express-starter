@@ -79,6 +79,8 @@ ehthumbs.db
 Thumbs.db
 *.tmp
 *.bak
+*.log
+*.sh
 
 # Database files
 *.sqlite
