@@ -84,16 +84,18 @@ async function getServerInformation(): Promise<any> {
   const uptimeSeconds = Math.floor(uptimes.uptime);
 
   const ret = {
-    cpus, system, osInfo, mem, graphics,
-    disk, diskBlockDevices, fsSize,
-    usb,
-    networkInterfaces, networkConnections, wifiNetworks, wifiConnections,
-    docker,
-    version,
-    status: {
+    server_information: {
+      cpus, system, osInfo, mem, graphics,
+      disk, diskBlockDevices, fsSize,
+      usb,
+      networkInterfaces, networkConnections, wifiNetworks, wifiConnections,
+      docker,
+      version
+    },
+    server_status: {
       uptime: {
+        startDate: dayjs(uptimes.current - (uptimeSeconds * 1000)).format('YYYY-MM-DD HH:mm:ss'),
         ...uptimes,
-        date: dayjs(uptimes.current - (uptimeSeconds * 1000)).format('YYYY-MM-DD HH:mm:ss'),
         days: Math.floor(uptimeSeconds / 86400),
         hours: Math.floor(uptimeSeconds / 3600) % 24,
         minutes: Math.floor(uptimeSeconds / 60) % 60,
