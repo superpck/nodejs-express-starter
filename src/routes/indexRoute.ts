@@ -43,7 +43,7 @@ router.get('/health', (req, res) => {
 router.get('/client', async (req, res) => {
   res.json({
     status: 200,
-    time: new Date().toISOString(),
+    date: dayjs().format('YYYY-MM-DD HH:mm:ss'),
     "x-forwarded-for": req.headers["x-forwarded-for"] || '',
     "x-real-ip": req.headers["x-real-ip"] || '',
     "request-ip": req.ip || '',
@@ -51,12 +51,48 @@ router.get('/client', async (req, res) => {
   });
 });
 
-router.get('/server-status', async (req, res) => {
-  const server = await getServerInformation();
+router.get('/server-information', async (req, res) => {
+  const server_information = await getServerInformation();
   res.json({
     status: 200,
-    time: new Date().toISOString(),
-    server
+    date: dayjs().format('YYYY-MM-DD HH:mm:ss'),
+    server_information
+  });
+});
+
+router.get('/server-service', async (req, res) => {
+  const server_service = await si.networkConnections();
+  res.json({
+    status: 200,
+    date: dayjs().format('YYYY-MM-DD HH:mm:ss'),
+    server_service
+  });
+});
+
+router.get('/server-service-listen', async (req, res) => {
+  const server_service = await si.networkConnections();
+  res.json({
+    status: 200,
+    date: dayjs().format('YYYY-MM-DD HH:mm:ss'),
+    server_service: server_service.filter(s => s.state === 'LISTEN')
+  });
+});
+
+router.get('/server-application', async (req, res) => {
+  const server_application = await si.versions();
+  res.json({
+    status: 200,
+    date: dayjs().format('YYYY-MM-DD HH:mm:ss'),
+    server_application
+  });
+});
+
+router.get('/server-status', async (req, res) => {
+  const server_status = await getServerStatus();
+  res.json({
+    status: 200,
+    date: dayjs().format('YYYY-MM-DD HH:mm:ss'),
+    server_status
   });
 });
 
@@ -66,43 +102,61 @@ async function getServerInformation(): Promise<any> {
   const osInfo = await si.osInfo();
   const mem = await si.mem();
   const disk = await si.diskLayout();
-  const diskIO = await si.disksIO();
   const fsSize = await si.fsSize();
   const diskBlockDevices = await si.blockDevices();
   const networkInterfaces = await si.networkInterfaces();
-  const networkConnections = await si.networkConnections();
   const docker = await si.dockerInfo().catch(() => ({}));
-  // const uptimeSeconds = os.uptime();
-  const currentLoad = await si.currentLoad();
-  const cpuTemp = await si.cpuTemperature();
   const usb = await si.usb();
   const wifiNetworks = await si.wifiNetworks();
   const wifiConnections = await si.wifiConnections();
   const graphics = await si.graphics();
-  const version = await si.versions();
-  const uptimes = si.time();
-  const uptimeSeconds = Math.floor(uptimes.uptime);
 
   const ret = {
-    server_information: {
-      cpus, system, osInfo, mem, graphics,
-      disk, diskBlockDevices, fsSize,
-      usb,
-      networkInterfaces, networkConnections, wifiNetworks, wifiConnections,
-      docker,
-      version
+    cpus, system, osInfo, mem, graphics,
+    disk, diskBlockDevices, fsSize,
+    usb,
+    networkInterfaces: networkInterfaces.filter(n => (n.ip4 || n.ip6) && ['lo', 'lo0'].indexOf(n.iface) === -1),
+    wifiNetworks,
+    wifiConnections,
+    docker
+  }
+  return ret;
+}
+
+async function getServerStatus(): Promise<any> {
+  const diskIO = await si.disksIO();
+  const memory = await si.mem();
+  const fsSize = await si.fsSize();
+  const currentLoad = await si.currentLoad();
+  const cpuTemp = await si.cpuTemperature();
+  const uptimes = si.time();
+  const uptimeSeconds = Math.floor(uptimes.uptime);
+  const startDate = dayjs(uptimes.current - (uptimeSeconds * 1000)).format('YYYY-MM-DD HH:mm:ss');
+
+  const uptimeDiff = { 
+    seconds: dayjs().diff(dayjs(startDate), 'second') % 60,
+    minutes: dayjs().diff(dayjs(startDate), 'minute') % 60,
+    hours: dayjs().diff(dayjs(startDate), 'hour') % 24,
+    days: dayjs().diff(dayjs(startDate), 'day') % 7,
+    weeks: dayjs().diff(dayjs(startDate), 'week') % 4,
+    months: dayjs().diff(dayjs(startDate), 'month') % 12,
+    years: dayjs().diff(dayjs(startDate), 'year'),
+  };
+
+  const ret = {
+    uptime: {
+      startDate,
+      ...uptimes,
+      years: uptimeDiff.years,
+      months: uptimeDiff.months,
+      days: uptimeDiff.days,
+      hours: uptimeDiff.hours,
+      minutes: uptimeDiff.minutes,
+      seconds: uptimeDiff.seconds
     },
-    server_status: {
-      uptime: {
-        startDate: dayjs(uptimes.current - (uptimeSeconds * 1000)).format('YYYY-MM-DD HH:mm:ss'),
-        ...uptimes,
-        days: Math.floor(uptimeSeconds / 86400),
-        hours: Math.floor(uptimeSeconds / 3600) % 24,
-        minutes: Math.floor(uptimeSeconds / 60) % 60,
-        seconds: uptimeSeconds % 60
-      },
-      currentLoad, cpuTemp, diskIO
-    }
+    currentLoad, cpuTemp, diskIO,
+    memory,
+    disk: fsSize.filter(d => ['/', '/home', '/var', '/boot'].includes(d.mount))
   };
   return ret;
 }
