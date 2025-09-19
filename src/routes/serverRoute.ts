@@ -90,7 +90,7 @@ async function getServerInformation(): Promise<any> {
 
 async function getServerStatus(): Promise<any> {
   const diskIO = await si.disksIO();
-  const memory = await si.mem();
+  let memory: any = await si.mem();
   const fsSize = await si.fsSize();
   const currentLoad = await si.currentLoad();
   const cpuTemp = await si.cpuTemperature();
@@ -108,10 +108,32 @@ async function getServerStatus(): Promise<any> {
     years: dayjs().diff(dayjs(startDate), 'year'),
   };
 
+  memory = {
+    totalGB: Number((memory.total / (1024 * 1024 * 1024)).toFixed(2)),
+    usedGB: Number((memory.used / (1024 * 1024 * 1024)).toFixed(2)),
+    freeGB: Number((memory.free / (1024 * 1024 * 1024)).toFixed(2)),
+    activeGB: Number((memory.active / (1024 * 1024 * 1024)).toFixed(2)),
+    availableGB: Number((memory.available / (1024 * 1024 * 1024)).toFixed(2)),
+    swapTotalGB: Number((memory.swaptotal / (1024 * 1024 * 1024)).toFixed(2)),
+    swapUsedGB: Number((memory.swapused / (1024 * 1024 * 1024)).toFixed(2)),
+    swapFreeGB: Number((memory.swapfree / (1024 * 1024 * 1024)).toFixed(2)),
+    usedPercent: Number(((memory.used / memory.total) * 100).toFixed(2))
+  };
+  let disk = fsSize.filter(d => ['/', '/home', '/var', '/boot'].includes(d.mount))
+    .map(d => {
+      return {
+        mount: d.mount,
+        sizeGB: Number((d.size / (1024 * 1024 * 1024)).toFixed(2)),
+        usedGB: Number((d.used / (1024 * 1024 * 1024)).toFixed(2)),
+        availableGB: Number(((d.size - d.used) / (1024 * 1024 * 1024)).toFixed(2)),
+        usedPercent: Number(d.use.toFixed(2))
+      };
+    });  
+
   const ret = {
     uptime: {
       startDate,
-      ...uptimes,
+      uptimeSeconds,
       years: uptimeDiff.years,
       months: uptimeDiff.months,
       days: uptimeDiff.days,
@@ -121,7 +143,7 @@ async function getServerStatus(): Promise<any> {
     },
     currentLoad, cpuTemp,
     memory,
-    disk: fsSize.filter(d => ['/', '/home', '/var', '/boot'].includes(d.mount)),
+    disk,
     diskIO
   };
   return ret;
