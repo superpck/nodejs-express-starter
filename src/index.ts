@@ -10,6 +10,9 @@ dotenv.config();
 const app = express();
 const port = process.env.PORT || 3000;
 
+// Trust proxy configuration - required for proper IP detection behind proxies
+app.set('trust proxy', process.env.TRUST_PROXY || 1);
+
 // Middleware
 app.use(cors());
 app.use(helmet());

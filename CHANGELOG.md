@@ -5,16 +5,25 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [5.1.0] - 2025-09-19-1
+## [5.1.1] - 2025-09-19 (subVersion: 2025.09.19-4)
 
 ### Fixed
+- Added Express `trust proxy` configuration to fix express-rate-limit validation error
+- Resolved X-Forwarded-For header misconfiguration warning
+- Fixed duplicate JSON keys in package.json
 - Removed deprecated `@types/bcryptjs` and `@types/uuid` packages
 - Fixed TypeScript compilation errors related to missing type definitions
-- Modern bcryptjs and uuid packages now provide their own TypeScript types
+
+### Added
+- TRUST_PROXY environment variable configuration
+- Proxy configuration documentation in README
+- Enhanced environment variables table
 
 ### Changed
 - Updated dependencies to use built-in TypeScript definitions
 - Cleaned up package.json devDependencies
+- Optimized serverRoute.ts by combining `/service` and `/service/:mode` routes
+- Modern bcryptjs and uuid packages now provide their own TypeScript types
 
 ## [5.1.0] - 2025-08-11
 

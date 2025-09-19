@@ -177,6 +177,7 @@ npm run dev
 |----------|-------------|---------|---------|
 | `PORT` | Server port | `3000` | `3000` |
 | `JWT_SECRET` | Secret key for JWT signing | `your-secret-key` | `super-secure-jwt-secret-key` |
+| `TRUST_PROXY` | Trust proxy configuration for rate limiting | `1` | `1`, `2`, `true` |
 | `DB_TYPE` | Database type | `development` | `development` or `postgres` |
 | `DB_HOST` | Database host | `localhost` | `localhost` |
 | `DB_PORT` | Database port | `3306` (MySQL) / `5432` (PostgreSQL) | `3306` |

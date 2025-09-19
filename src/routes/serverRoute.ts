@@ -26,21 +26,46 @@ router.get('/information', async (req, res) => {
 });
 
 router.get('/service', async (req, res) => {
-  const server_service = await si.networkConnections();
-  res.json({
-    status: 200,
-    date: dayjs().format('YYYY-MM-DD HH:mm:ss'),
-    server_service
-  });
+  try {
+    const server_service = await si.networkConnections();
+    
+    res.json({
+      status: 200,
+      date: dayjs().format('YYYY-MM-DD HH:mm:ss'),
+      server_service
+    });
+  } catch (error) {
+    res.status(500).json({
+      status: 500,
+      date: dayjs().format('YYYY-MM-DD HH:mm:ss'),
+      error: 'Failed to retrieve network connections',
+      message: error instanceof Error ? error.message : 'Unknown error'
+    });
+  }
 });
 
-router.get('/service-listen', async (req, res) => {
-  const server_service = await si.networkConnections();
-  res.json({
-    status: 200,
-    date: dayjs().format('YYYY-MM-DD HH:mm:ss'),
-    server_service: server_service.filter(s => s.state === 'LISTEN')
-  });
+router.get('/service/:mode', async (req, res) => {
+  try {
+    const { mode } = req.params;
+    const server_service = await si.networkConnections();
+    
+    // Filter by mode
+    const filteredService = server_service.filter(s => s.state === mode.toUpperCase());
+    
+    res.json({
+      status: 200,
+      date: dayjs().format('YYYY-MM-DD HH:mm:ss'),
+      server_service: filteredService,
+      filter_mode: mode.toUpperCase()
+    });
+  } catch (error) {
+    res.status(500).json({
+      status: 500,
+      date: dayjs().format('YYYY-MM-DD HH:mm:ss'),
+      error: 'Failed to retrieve network connections',
+      message: error instanceof Error ? error.message : 'Unknown error'
+    });
+  }
 });
 
 router.get('/application', async (req, res) => {
@@ -65,7 +90,7 @@ async function getServerInformation(): Promise<any> {
   const cpus = await si.cpu();
   const system = await si.system();
   const osInfo = await si.osInfo();
-  const mem = await si.mem();
+  const mem: any = await si.mem();
   const disk = await si.diskLayout();
   const fsSize = await si.fsSize();
   const diskBlockDevices = await si.blockDevices();
@@ -75,6 +100,8 @@ async function getServerInformation(): Promise<any> {
   const wifiNetworks = await si.wifiNetworks();
   const wifiConnections = await si.wifiConnections();
   const graphics = await si.graphics();
+
+  mem.usedPercent = Number(((mem.used / mem.total) * 100).toFixed(2));
 
   const ret = {
     cpus, system, osInfo, mem, graphics,
@@ -98,7 +125,7 @@ async function getServerStatus(): Promise<any> {
   const uptimeSeconds = Math.floor(uptimes.uptime);
   const startDate = dayjs(uptimes.current - (uptimeSeconds * 1000)).format('YYYY-MM-DD HH:mm:ss');
 
-  const uptimeDiff = { 
+  const uptimeDiff = {
     seconds: dayjs().diff(dayjs(startDate), 'second') % 60,
     minutes: dayjs().diff(dayjs(startDate), 'minute') % 60,
     hours: dayjs().diff(dayjs(startDate), 'hour') % 24,
@@ -128,7 +155,7 @@ async function getServerStatus(): Promise<any> {
         availableGB: Number(((d.size - d.used) / (1024 * 1024 * 1024)).toFixed(2)),
         usedPercent: Number(d.use.toFixed(2))
       };
-    });  
+    });
 
   const ret = {
     uptime: {
