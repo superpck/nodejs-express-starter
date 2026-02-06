@@ -3,7 +3,8 @@
 All notable changes to this project will be documented in this file.
 
 ## [5.2.1] - 2026-02-06
-- Update express
+### update
+- Update express to 5.2.1
 - Update package
 
 ## [5.1.1] - 2025-09-19
